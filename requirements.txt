@@ -1,1 +1,3 @@
 werkzeug
+mysql-python
+dateutil
