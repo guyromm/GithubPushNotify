@@ -11,7 +11,11 @@ nomatch={}
 #-- select * from threadedcomments_threadedcomment where comment like 'github commit%'\G
 def import_commit(repo,payload):
     global nomatch
-    for commit in payload['payload']['commits']:
+    if 'payload' in payload:
+        loopover = payload['payload']
+    else:
+        loopover = payload
+    for commit in loopover['commits']:
         sres = storyre.search(commit['message'])
         fstoryid=None
         if sres:
@@ -36,10 +40,11 @@ def import_commit(repo,payload):
             if fstoryid:
                 print('want to tie this commit\'s story %s -> %s'%(storyid,fstoryid))
                 userid=1
-                import dateutil.parser
-                pdate = dateutil.parser.parse(commit['timestamp'])
+                import iso8601
+                print 'trying to parse %s'%commit['timestamp']
+                pdate = iso8601.parse_date(commit['timestamp']) #dateutil.parser.parse(commit['timestamp'])
                 comurl = commit['url'] #comid = '/%s/%s/commit/%s'%(GITHUB_USER,projfn,c['id'])
-                message = 'github commit ( %s ):\n %s'%(comurl,commit['message'])
+                message = 'github commit %s :\n %s'%(comurl,commit['message'])
                 c.execute("select count(*) from threadedcomments_threadedcomment where user_id=%s and object_id=%s and comment=%s",(userid,fstoryid,message))
                 excom = c.fetchone()[0]
                 if not excom:

@@ -1,3 +1,4 @@
 werkzeug
 mysql-python
-dateutil
+python-dateutil
+iso8601

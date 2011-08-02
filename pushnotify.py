@@ -39,18 +39,21 @@ def application(request):
         print 'authentication for %s failed'%repo
         r = Response('Auth failed',403)
         r.status_code = 403
-    #repo,key = mapres.groups()
-    repo = pl['payload']['repository']['name']
-
-    if repo not in reposkeys or reposkeys[repo]['key']!=key:
-        print 'authentication for %s failed'%repo
-        r = Response('Auth failed',403)
-        r.status_code = 403
-        return r
+    disregard,key = mapres.groups()
 
     if 'payload' in request.form:
         try:
             payload = json.loads(request.form['payload'])
+
+            repo = payload['repository']['name']
+
+            if repo not in reposkeys or reposkeys[repo]['key']!=key:
+                print 'authentication for %s failed'%repo
+                r = Response('Auth failed',403)
+                r.status_code = 403
+                return r
+
+
             actonpayload(repo,payload,append=True)
             return Response('payload saved & acted upon.')
         except ValueError:
