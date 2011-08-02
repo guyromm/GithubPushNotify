@@ -4,15 +4,20 @@ args = json.loads(open('mysql.json','r').read())
 conn = my.connect(**args)
 
 storyre = re.compile('#(\d+)')
-
+nomatch={}
+#sql to see there are no dupes by message:
+#-- select * from (select comment,object_id,count(*) cnt from threadedcomments_threadedcomment where comment like 'github commit%' group by comment,object_id order by cnt) foo where cnt>1;
+#sql to see/delete existing github commit comments:
+#-- select * from threadedcomments_threadedcomment where comment like 'github commit%'\G
 def import_commit(repo,payload):
+    global nomatch
     for commit in payload['payload']['commits']:
         sres = storyre.search(commit['message'])
         fstoryid=None
         if sres:
             storyid = sres.group(1)
             c = conn.cursor()
-            res = c.execute("select id from projects_story where id=%s",storyid)
+            res = c.execute("select id from projects_story where id=%s or local_id=%s",(storyid,storyid))
             row = c.fetchone()
             if row:
                 fstoryid = row[0]
@@ -33,7 +38,8 @@ def import_commit(repo,payload):
                 userid=1
                 import dateutil.parser
                 pdate = dateutil.parser.parse(commit['timestamp'])
-                message = commit['message']
+                comurl = commit['url'] #comid = '/%s/%s/commit/%s'%(GITHUB_USER,projfn,c['id'])
+                message = 'github commit ( %s ):\n %s'%(comurl,commit['message'])
                 c.execute("select count(*) from threadedcomments_threadedcomment where user_id=%s and object_id=%s and comment=%s",(userid,fstoryid,message))
                 excom = c.fetchone()[0]
                 if not excom:
@@ -61,4 +67,8 @@ def import_commit(repo,payload):
                 else:
                     print 'comment already exists.'
             else:
+                if storyid not in nomatch:
+                    nomatch[storyid]=0
+                nomatch[storyid]+=1
                 print 'story %s from message "%s" does not match any scrumdo story'%(storyid,commit['message'])
+    #print nomatch
