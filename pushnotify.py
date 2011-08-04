@@ -39,6 +39,7 @@ def application(request):
         print 'authentication failed'
         r = Response('Auth failed',403)
         r.status_code = 403
+        return r
     disregard,key = mapres.groups()
 
     if 'payload' in request.form:
