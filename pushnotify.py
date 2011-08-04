@@ -36,7 +36,7 @@ def actonpayload(repo,payload,append,runcmd=True,executemod=True):
 def application(request):
     mapres = mapre.search(request.url)
     if not request.method=='POST' or not mapres:
-        print 'authentication for %s failed'%repo
+        print 'authentication failed'
         r = Response('Auth failed',403)
         r.status_code = 403
     disregard,key = mapres.groups()
