@@ -1,4 +1,7 @@
+twisted
+pyOpenSSL
 werkzeug
 mysql-python
 python-dateutil
 iso8601
+https://github.com/mariano/pyfire/tarball/master

@@ -16,10 +16,15 @@ def actonpayload(repo,payload,append,runcmd=True,executemod=True):
             print 'no command set to run for this hook'
         st=-1 ; op = None
     if executemod and 'execute' in reposkeys[repo]:
-        mod,func = reposkeys[repo]['execute'].split('::')
-        modi = __import__(mod)
-        exec_func = getattr(getattr(modi,mod.split('.')[-1]),func)
-        exec_func(repo,payload)
+        if (type(reposkeys[repo]['execute'])!=list):
+            execs = [reposkeys[repo]['execute']]
+        else:
+            execs = reposkeys[repo]['execute']
+        for execitem in execs:
+            mod,func = execitem.split('::')
+            modi = __import__(mod)
+            exec_func = getattr(getattr(modi,mod.split('.')[-1]),func)
+            exec_func(repo,payload)
                 
         
     nwr = {'stamp':datetime.datetime.now().isoformat(),'payload':payload,'cmd_st':st,'cmd_op':op}
