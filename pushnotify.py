@@ -73,6 +73,9 @@ if __name__ == '__main__':
     import sys
     from werkzeug.serving import run_simple
     if len(sys.argv)>1 and sys.argv[1]=='testrun':
+        if len(sys.argv)>2:
+            reposkeys = json.loads(open(sys.argv[2],'r').read())
+            print 'read repos off %s'%sys.argv[2] 
         cnt=0
         for pl in payloads:
             repo = pl['payload']['repository']['name']
