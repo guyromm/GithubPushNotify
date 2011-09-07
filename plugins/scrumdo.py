@@ -16,9 +16,10 @@ def import_commit(repo,payload):
     else:
         loopover = payload
     for commit in loopover['commits']:
-        sres = storyre.search(commit['message'])
+        sresults = re.finditer(storyre,commit['message'])
         fstoryid=None
-        if sres:
+        for sres in sresults:
+            print 'handling result %s'%sres.groups()
             storyid = sres.group(1)
             c = conn.cursor()
             res = c.execute("select id from projects_story where id=%s or local_id=%s",(storyid,storyid))
