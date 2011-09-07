@@ -44,7 +44,7 @@ def import_commit(repo,payload):
                 print 'trying to parse %s'%commit['timestamp']
                 pdate = iso8601.parse_date(commit['timestamp']) #dateutil.parser.parse(commit['timestamp'])
                 comurl = commit['url'] #comid = '/%s/%s/commit/%s'%(GITHUB_USER,projfn,c['id'])
-                message = 'github commit %s :\n %s'%(comurl,commit['message'])
+                message = '%s commited to github: %s :\n %s'%(commit['author']['email'],comurl,commit['message'])
                 c.execute("select count(*) from threadedcomments_threadedcomment where user_id=%s and object_id=%s and comment=%s",(userid,fstoryid,message))
                 excom = c.fetchone()[0]
                 if not excom:
