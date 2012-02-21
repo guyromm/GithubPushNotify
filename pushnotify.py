@@ -41,7 +41,7 @@ def actonpayload(repo,payload,append,runcmd=True,executemod=True):
 def application(request):
     mapres = mapre.search(request.url)
     if not request.method=='POST' or not mapres:
-        print 'authentication failed'
+        print 'authentication failed of %s'%request.url
         r = Response('Auth failed',403)
         r.status_code = 403
         return r
@@ -54,7 +54,7 @@ def application(request):
             repo = payload['repository']['name']
 
             if repo not in reposkeys or reposkeys[repo]['key']!=key:
-                print 'authentication for %s failed'%repo
+                print 'authentication for %s failed - %s<>%s'%(repo,key,reposkeys[repo]['key'])
                 r = Response('Auth failed',403)
                 r.status_code = 403
                 return r
@@ -83,4 +83,4 @@ if __name__ == '__main__':
             cnt+=1
         print '%s payloads processed'%(cnt)
     else:
-        run_simple('85.17.122.213', 8081, application)
+        run_simple('0.0.0.0',8081, application)
